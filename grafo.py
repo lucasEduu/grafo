@@ -12,8 +12,9 @@ class grafo:
     def aresta(self, u, v):
         if self.direcionado:
             for item in self.adjacencias[u]:
-                if item[0] == v: return True
-                return False
+                if item[0] == v: 
+                    return True
+            return False
         else:
             flag_1 = flag_2 = False
             for item in self.adjacencias[u]:
@@ -35,11 +36,20 @@ class grafo:
             self.adjacencias[v].append(item)
 
     def remover_aresta(self, u, v):
+        
+        i = j = 0
         for item in self.adjacencias[u]:
-            if item[0] == v: item = None
+            if item[0] == v:
+                self.adjacencias[u].pop(i)
+            else:
+                i += 1
         if not self.direcionado:
             for item in self.adjacencias[v]:
-                if item[0] == u: item = None
+                if item[0] == u:
+                    self.adjacencias[v].pop(j)
+                else:
+                    j += 1
+
     
     def encontrar_adjacencias(self, u):
 
@@ -114,17 +124,14 @@ def imprimir_adjacentes(u):
             ult = lista_str[-1]
             txt = ', '.join(prim) + ' e ' + ult
 
-def imprimir_matriz_adj():
-    print("   |" + "|".join([f" {_:2d} " for _ in range(grafo.num_vertices)]))
-    print("---+" + "|".join(["----"] * grafo.num_vertices))
-    for u in range(grafo.num_vertices):
-        print(f"{u:2d} ", end='')
-        for v in range(grafo.num_vertices):
-            if grafo.aresta(u, v):
-                print(f"| {grafo.peso(u, v):2d} ", end='')
-            else:
-                print(f"|    ", end='')
+def imprimir_lista_adj():
+
+    for i in range(g.num_vertices):
+        print(f'Adjacencias do vertice {i + 1}: ', end = '')
+        for item in g.adjacencias[i]:
+            print(f'[({item[0]}, {g.peso(i, item[0])})]', end = '')
         print()
+
 
 def sair():
     print('Saindo...')
@@ -143,7 +150,17 @@ def main():
     # print(g.peso(2, 0))
 
     while True:
+
+        print('===============GRAFO===============')
+        print('Escolha uma das seguintes opcoes: ')
+        print('1. Criar grafo.')
+        print('2. Inserir n arestas.')
+        print('3. Remover aresta.')
+        print('4. Imprimir adjacencias de um vertice u.')
+        print('5. Imprimir lista de adjacencias.')
+        print('6. Sair.')
         
+        print('Digite sua opcao: ', end = '')
         opc = int(input())
 
         match opc:
@@ -154,20 +171,30 @@ def main():
                 direcionado = input()
                 cria_grafo(num_vertices, direcionado)
             case 2:
-                print('Digite a primeira aresta: ', end = '')
-                u = int(input())
-                print('Digite a segunda aresta: ', end = '')
-                v = int(input())
-                print('Digite o peso: ', end = '')
-                w = int(input())
-                insere_aresta(u, v, w)
+                print('Digite a quantidade de arestas que voce quer adicionar: ', end = '')
+                num = int(input())
+                for _ in range(num):   
+                    print('Digite o primeiro vertice: ', end = '')
+                    u = int(input())
+                    print('Digite o segundo vertice: ', end = '')
+                    v = int(input())
+                    print('Digite o peso: ', end = '')
+                    w = int(input())
+                    insere_aresta(u, v, w)
             case 3:
-                print('Digite ')            
+                print('Digite o primeiro vertice: ', end = '')
+                u = int(input())
+                print('Digite o segundo vertice: ', end = '')
+                v = int(input())
+                remove_aresta(u, v)
+            case 4:
+                print('Digite o vertice: ', end = '')
+                u = int(input())
+                imprimir_adjacentes(u)
+            case 5:
+                imprimir_lista_adj()
+            case 6:
+                sair()            
 
 if __name__ == '__main__':
     main()
-
-
-
-
-            
