@@ -1,6 +1,40 @@
+class elemento:
+	
+	def __init__(self, vertice, peso):
+		self.vertice = vertice
+		self.peso = peso
+	
+	def __lt__(self, outro):
+		return self.peso < outro.peso
+	
+def min_heapify(vet, raiz, tam):
+	
+	menor = raiz
+	
+	esq = (2 * raiz) + 1
+	while esq < tam and vet[esq] < vet[menor]:
+		menor = esq
+	
+	dire = (2 * raiz) + 2
+	while dire < tam and vet[dire] < vet[menor]:
+		menor = dire
+	
+	if raiz != menor:
+		vet[raiz], vet[menor] = vet[menor], vet[raiz]
+		min_heapify(vet, menor, tam)
+	
+def montar_min_heap(vet, tam):
+	
+	ult = (tam // 2) - 1
+	for i in range(ult, -1, -1):
+		min_heapify(vet, i, tam)
+# CLASSE ELEMENTO E FUNÇÕES DE HEAP MÍNIMA
+# (ESTÃO AQUI PARA GERENCIAR A FILA DE PRIORIDADE DA FUNÇÃO DE DIJKSTRA)
+
 class grafo:
 
     def __init__(self, num_vertices, direcionado):
+
         self.num_vertices = num_vertices
         self.direcionado = direcionado
 
@@ -10,27 +44,38 @@ class grafo:
         #     self.adjacencias[i] = []
     
     def aresta(self, u, v):
+
         if self.direcionado:
             for item in self.adjacencias[u]:
                 if item[0] == v: 
                     return True
             return False
+        
         else:
+
             flag_1 = flag_2 = False
+
             for item in self.adjacencias[u]:
-                if item[0] == v: flag_1 = True
+                if item[0] == v: 
+                    flag_1 = True
             for item in self.adjacencias[v]:
-                if item[0] == u: flag_2 = True
+                if item[0] == u: 
+                    flag_2 = True
+
             return flag_1 is True and flag_2 is True
     
     def peso(self, u, v):
+
         for item in self.adjacencias[u]:
-            if item[0] == v: return item[1]
+            if item[0] == v: 
+                return item[1]
         return None
     
     def inserir_aresta(self, u, v, w):
+
         item = [v, w]
         self.adjacencias[u].append(item)
+
         if not self.direcionado:
             item = [u, w]
             self.adjacencias[v].append(item)
@@ -38,18 +83,19 @@ class grafo:
     def remover_aresta(self, u, v):
         
         i = j = 0
+
         for item in self.adjacencias[u]:
             if item[0] == v:
                 self.adjacencias[u].pop(i)
             else:
                 i += 1
+
         if not self.direcionado:
             for item in self.adjacencias[v]:
                 if item[0] == u:
                     self.adjacencias[v].pop(j)
                 else:
                     j += 1
-
     
     def encontrar_adjacencias(self, u):
 
@@ -60,7 +106,48 @@ class grafo:
                 saida.append(item[0])
         
         return saida
+    
+    def dfs(self, u):
+        pass
 
+    def bfs(self, u):
+        pass
+
+    def floyd_warshall(self, u):
+        pass
+
+    # ==========ALGORITMO DE DIJKSTRA========== 
+    # (RETORNA A LISTA DE DISTANCIAS DE TODOS OS VERTICES EM RELAÇÃO AO
+    # VERTICE PASSADO COMO PARÂMETRO)
+    def dijkstra(self, u):
+
+        agenda = []
+        pai = [-1 for _ in range(self.num_vertices)]
+        distancias = [1_000_000 for _ in range(self.num_vertices)]
+
+        agenda.append(elemento(u, 0))
+        distancias[u] = 0
+
+        while agenda != []:
+
+            elem = agenda.pop(0)
+            vertice_da_vez, custo = elem.vertice, elem.peso
+            todas_adjacencias = self.encontrar_adjacencias(vertice_da_vez)
+
+            for v in todas_adjacencias:
+
+                novo_peso = custo + self.peso(vertice_da_vez, v)
+
+                if distancias[v] > novo_peso:
+                    distancias[v] = novo_peso
+                    pai[v] = vertice_da_vez
+                    agenda.append(elemento(v, novo_peso))
+                    montar_min_heap(agenda, len(agenda))
+
+        return distancias
+
+
+# FUNÇÕES DE INTERAÇÃO COM O USUÁRIO
 def cria_grafo(num_vertices, direcionado):
 
     global g
@@ -123,31 +210,22 @@ def imprimir_adjacentes(u):
             prim = lista_str[:-1]
             ult = lista_str[-1]
             txt = ', '.join(prim) + ' e ' + ult
+        
+        print(f"Vértices adjacentes a {u}: {txt}.")
 
-def imprimir_lista_adj():
+# def imprimir_lista_adj():
 
-    for i in range(g.num_vertices):
-        print(f'Adjacencias do vertice {i + 1}: ', end = '')
-        for item in g.adjacencias[i]:
-            print(f'[({item[0]}, {g.peso(i, item[0])})]', end = '')
-        print()
-
+#     for i in range(g.num_vertices):
+#         print(f'Adjacencias do vertice {i + 1}: ', end = '')
+#         for item in g.adjacencias[i]:
+#             print(f'[({item[0]}, {g.peso(i, item[0])})]', end = '')
+#         print()
 
 def sair():
     print('Saindo...')
     exit()
 
 def main():
-    # g = grafo(3, False)
-    # g.inserir_aresta(0, 1, 1)
-    # g.inserir_aresta(1, 2, 2)
-    # g.inserir_aresta(2, 0, 3)
-    # print(g.encontrar_adjacencias(0))
-    # print(g.encontrar_adjacencias(1))
-    # print(g.encontrar_adjacencias(2))
-    # print(g.peso(0, 1))
-    # print(g.peso(1, 2))
-    # print(g.peso(2, 0))
 
     while True:
 
@@ -191,8 +269,8 @@ def main():
                 print('Digite o vertice: ', end = '')
                 u = int(input())
                 imprimir_adjacentes(u)
-            case 5:
-                imprimir_lista_adj()
+            # case 5:
+            #     imprimir_lista_adj()
             case 6:
                 sair()            
 
